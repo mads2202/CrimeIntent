@@ -7,6 +7,7 @@ class Crime{
      var mTitle:String?=null
      var mDate:Date
      var mIsSolved:Boolean?=null
+     var mRequiresPolice:Boolean=false
 
     init {
         mId= UUID.randomUUID()

@@ -28,13 +28,13 @@ class CrimeFragment: Fragment() {
         mTitleField=mView.findViewById(R.id.crime_title)
         mTitleField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                TODO("Not yet implemented")
+                //
             }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 mCrime.mTitle=s.toString()
             }
             override fun afterTextChanged(s: Editable?) {
-                TODO("Not yet implemented")
+                //
             }
         })
         mDateButton=mView.findViewById(R.id.crime_date)
