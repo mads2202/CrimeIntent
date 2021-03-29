@@ -62,7 +62,7 @@ class CrimeFragment : Fragment() {
         return mView
     }
 
-    fun fillFragment(mCrime: Crime) {
+    fun  fillFragment(mCrime: Crime) {
         mTitleField.setText(mCrime.mTitle)
         mTitleField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
