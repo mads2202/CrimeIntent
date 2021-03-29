@@ -11,37 +11,80 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import java.util.*
 
 
-class CrimeFragment: Fragment() {
-    private lateinit var  mCrime:Crime
-    private lateinit var mTitleField:EditText
-    private lateinit var mDateButton:Button
-    private lateinit var mSolvedCheckBox:CheckBox
+class CrimeFragment : Fragment() {
+    private lateinit var mCrime: Crime
+    private lateinit var mTitleField: EditText
+    private lateinit var mDateButton: Button
+    private lateinit var mSolvedCheckBox: CheckBox
+    lateinit var mFirstElementButton: Button
+    lateinit var mLastElementButton: Button
+
+    companion object {
+        val EXTRA_CRIME_ID = "com.mads2202.crimeintent.crime_id"
+        fun newInstance(id: UUID): CrimeFragment {
+            var args: Bundle = Bundle()
+            args.putSerializable(EXTRA_CRIME_ID, id)
+            var fragment: CrimeFragment = CrimeFragment()
+            fragment.arguments = args
+            return fragment
+        }
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mCrime= Crime()
+        var id: UUID = arguments!!.getSerializable(CrimePaperActivity.EXTRA_CRIME_ID) as UUID
+        if (CrimeLab.getCrime(id) == null)
+            mCrime = Crime()
+        else
+            mCrime = CrimeLab.getCrime(id)!!
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var mView= inflater.inflate(R.layout.fragment_crime,container,false)
-        mTitleField=mView.findViewById(R.id.crime_title)
+        var mView = inflater.inflate(R.layout.fragment_crime, container, false)
+        mTitleField = mView.findViewById(R.id.crime_title)
+        mDateButton = mView.findViewById(R.id.crime_date)
+        mSolvedCheckBox = mView.findViewById(R.id.crime_solved)
+        fillFragment(mCrime)
+        mFirstElementButton = mView.findViewById(R.id.first_element_button)
+        mFirstElementButton.setOnClickListener {
+            CrimePaperActivity.mViewPager.currentItem=0
+
+        }
+        mLastElementButton = mView.findViewById(R.id.last_element_button)
+        mLastElementButton.setOnClickListener {
+            CrimePaperActivity.mViewPager.currentItem=CrimeLab.mCrimeList.size-1
+        }
+        return mView
+    }
+
+    fun fillFragment(mCrime: Crime) {
+        mTitleField.setText(mCrime.mTitle)
         mTitleField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //
             }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                mCrime.mTitle=s.toString()
+                mCrime.mTitle = s.toString()
             }
+
             override fun afterTextChanged(s: Editable?) {
                 //
             }
         })
-        mDateButton=mView.findViewById(R.id.crime_date)
-        mDateButton.text=mCrime.mDate.toString()
+
+        mDateButton.text = mCrime.mDate.toString()
         mDateButton.isEnabled = false
-        mSolvedCheckBox=mView.findViewById(R.id.crime_solved)
-        mSolvedCheckBox.setOnCheckedChangeListener{ compoundButton: CompoundButton, b: Boolean -> mCrime.mIsSolved=true}
-        return mView
+
+        mSolvedCheckBox.setChecked(mCrime.mIsSolved)
+        mSolvedCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
+            mCrime.mIsSolved = b
+        }
+
     }
 }

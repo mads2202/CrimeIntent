@@ -1,9 +1,13 @@
 package com.mads2202.crimeintent
 
+import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateFormat
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -14,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 class CrimeListFragment:Fragment() {
     lateinit var  mCrimeRecyclerView:RecyclerView
     lateinit var mCrimeAdapter:CrimeAdapter
+     var mPosition:Int=0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var mView= inflater.inflate(R.layout.fragment_crime_list,container,false)
         mCrimeRecyclerView=mView.findViewById(R.id.crime_recycler_view)
@@ -23,8 +29,10 @@ class CrimeListFragment:Fragment() {
     }
     private fun updateUi():Unit{
         CrimeLab.fillCrimeList()
+
         mCrimeAdapter=CrimeAdapter(CrimeLab.mCrimeList)
         mCrimeRecyclerView.adapter=mCrimeAdapter
+        mCrimeAdapter.notifyItemChanged(mPosition)
 
 
     }
@@ -34,10 +42,12 @@ class CrimeListFragment:Fragment() {
         inflater.inflate(R.layout.list_item_crime,parent,false)){
         var mTitleTextView:TextView
         var mDateTextView:TextView
+        var mCrimeSolved:ImageView
         lateinit var mCrime:Crime
        init {
            mTitleTextView=itemView.findViewById(R.id.crime_title)
            mDateTextView=itemView.findViewById(R.id.crime_date)
+           mCrimeSolved=itemView.findViewById(R.id.crime_solved)
 
 
 
@@ -46,7 +56,8 @@ class CrimeListFragment:Fragment() {
            if(!crime.mRequiresPolice){
            mCrime=crime
            mTitleTextView.text=crime.mTitle
-           mDateTextView.text=crime.mDate.toString()}
+           mDateTextView.text=crime.mDate.toString()
+           }
 
 
        }
@@ -67,7 +78,7 @@ class CrimeListFragment:Fragment() {
             if(crime.mRequiresPolice){
             mCrime=crime
             mTitleTextView.text=crime.mTitle
-            mDateTextView.text=crime.mDate.toString()
+            mDateTextView.text=DateFormat.format("EEEE, MMMM d, yyyy",crime.mDate)
             }
 
         }
@@ -97,7 +108,9 @@ class CrimeListFragment:Fragment() {
 
             }
             holder.itemView.setOnClickListener{
-                Toast.makeText(activity,"Click",Toast.LENGTH_SHORT).show()
+                var intent=CrimePaperActivity.newIntent(activity!!,crimeList[position].mId!!)
+                startActivity(intent)
+                mPosition=position
             }
 
         }
@@ -113,4 +126,8 @@ class CrimeListFragment:Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateUi()
+    }
 }

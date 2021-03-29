@@ -10,7 +10,7 @@ object CrimeLab {
     fun fillCrimeList(){
         for(x in 0..100){
             var mCrime=Crime()
-            mCrime.mTitle="# $x"
+            mCrime.mTitle="Преступление # $x"
             mCrime.mIsSolved=x%2==0
             mCrime.mRequiresPolice=x%2==0
             mCrimeList.add(mCrime)

@@ -6,12 +6,13 @@ class Crime{
      val mId:UUID
      var mTitle:String?=null
      var mDate:Date
-     var mIsSolved:Boolean?=null
+     var  mIsSolved:Boolean
      var mRequiresPolice:Boolean=false
 
     init {
         mId= UUID.randomUUID()
         mDate=Date()
+        mIsSolved=false
     }
 
 
