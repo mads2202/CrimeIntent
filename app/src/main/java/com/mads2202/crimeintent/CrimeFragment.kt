@@ -1,5 +1,6 @@
 package com.mads2202.crimeintent
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +26,8 @@ class CrimeFragment : Fragment() {
 
     companion object {
         val EXTRA_CRIME_ID = "com.mads2202.crimeintent.crime_id"
+        val DIALOG_DATE="DialogDate"
+        val REQUEST_DATE=0
         fun newInstance(id: UUID): CrimeFragment {
             var args: Bundle = Bundle()
             args.putSerializable(EXTRA_CRIME_ID, id)
@@ -79,12 +82,24 @@ class CrimeFragment : Fragment() {
         })
 
         mDateButton.text = mCrime.mDate.toString()
-        mDateButton.isEnabled = false
+        mDateButton.setOnClickListener {
+            var fragmentManager=fragmentManager
+            var datePickerFragment=DatePickerFragment.newInstance(mCrime.mDate)
+            datePickerFragment.setTargetFragment(this,REQUEST_DATE)
+            datePickerFragment.show(fragmentManager!!, DIALOG_DATE)
+        }
 
         mSolvedCheckBox.setChecked(mCrime.mIsSolved)
         mSolvedCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
             mCrime.mIsSolved = b
         }
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode==REQUEST_DATE){
+           var date= data!!.getSerializableExtra(DatePickerFragment.EXTRA_DATE) as Date
+            mCrime.mDate=date
+            mDateButton.text = mCrime.mDate.toString()
+        }
     }
 }
