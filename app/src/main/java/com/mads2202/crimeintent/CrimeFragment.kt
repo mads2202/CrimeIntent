@@ -13,6 +13,7 @@ import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import java.text.DateFormat
 import java.util.*
 
 
@@ -20,6 +21,7 @@ class CrimeFragment : Fragment() {
     private lateinit var mCrime: Crime
     private lateinit var mTitleField: EditText
     private lateinit var mDateButton: Button
+    private lateinit var mTimeButton:Button
     private lateinit var mSolvedCheckBox: CheckBox
     lateinit var mFirstElementButton: Button
     lateinit var mLastElementButton: Button
@@ -27,7 +29,9 @@ class CrimeFragment : Fragment() {
     companion object {
         val EXTRA_CRIME_ID = "com.mads2202.crimeintent.crime_id"
         val DIALOG_DATE="DialogDate"
+        val DIALOG_TIME="DialogTime"
         val REQUEST_DATE=0
+        val REQUEST_TIME=1
         fun newInstance(id: UUID): CrimeFragment {
             var args: Bundle = Bundle()
             args.putSerializable(EXTRA_CRIME_ID, id)
@@ -52,6 +56,7 @@ class CrimeFragment : Fragment() {
         mTitleField = mView.findViewById(R.id.crime_title)
         mDateButton = mView.findViewById(R.id.crime_date)
         mSolvedCheckBox = mView.findViewById(R.id.crime_solved)
+        mTimeButton=mView.findViewById(R.id.time_button)
         fillFragment(mCrime)
         mFirstElementButton = mView.findViewById(R.id.first_element_button)
         mFirstElementButton.setOnClickListener {
@@ -81,12 +86,18 @@ class CrimeFragment : Fragment() {
             }
         })
 
-        mDateButton.text = mCrime.mDate.toString()
+        mDateButton.text = android.text.format.DateFormat.format("EEEE, dd MMMM, yyyy",mCrime.mDate)
         mDateButton.setOnClickListener {
             var fragmentManager=fragmentManager
             var datePickerFragment=DatePickerFragment.newInstance(mCrime.mDate)
             datePickerFragment.setTargetFragment(this,REQUEST_DATE)
             datePickerFragment.show(fragmentManager!!, DIALOG_DATE)
+        }
+        mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z",mCrime.mDate)
+        mTimeButton.setOnClickListener {
+            var timePickerFragment=TimePickerFragment.newInstance(mCrime.mDate)
+            timePickerFragment.setTargetFragment(this, REQUEST_TIME)
+            timePickerFragment.show(fragmentManager!!,DIALOG_TIME)
         }
 
         mSolvedCheckBox.setChecked(mCrime.mIsSolved)
@@ -99,7 +110,12 @@ class CrimeFragment : Fragment() {
         if(requestCode==REQUEST_DATE){
            var date= data!!.getSerializableExtra(DatePickerFragment.EXTRA_DATE) as Date
             mCrime.mDate=date
-            mDateButton.text = mCrime.mDate.toString()
+            mDateButton.text = android.text.format.DateFormat.format("EEEE, dd MMMM, yyyy",mCrime.mDate)
+        }
+        if(requestCode== REQUEST_TIME){
+            var date= data!!.getSerializableExtra(TimePickerFragment.EXTRA_TIME) as Date
+            mCrime.mDate=date
+            mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z",mCrime.mDate)
         }
     }
 }
