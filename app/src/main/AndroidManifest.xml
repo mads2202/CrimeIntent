@@ -8,8 +8,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CrimeIntent">
-        <activity android:name=".CrimePaperActivity"></activity>
+        android:theme="@style/Theme.AppCompat.DayNight">
+        <activity
+            android:name=".CrimePaperActivity"
+            android:parentActivityName=".CrimeListActivity"
+            >
+        </activity>
         <activity android:name=".CrimeListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

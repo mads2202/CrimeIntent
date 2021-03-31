@@ -1,45 +1,52 @@
 package com.mads2202.crimeintent
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.text.format.DateUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
+
 class CrimeListFragment:Fragment() {
     lateinit var  mCrimeRecyclerView:RecyclerView
     lateinit var mCrimeAdapter:CrimeAdapter
+     var isSubtitleVisible=false
      var mPosition:Int=0
+    companion object{
+        val SAVED_SUBTITLE_VISIBLE = "subtitle"
+    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var mView= inflater.inflate(R.layout.fragment_crime_list,container,false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        var mView= inflater.inflate(R.layout.fragment_crime_list, container, false)
         mCrimeRecyclerView=mView.findViewById(R.id.crime_recycler_view)
         mCrimeRecyclerView.layoutManager=LinearLayoutManager(activity)
+        setHasOptionsMenu(true)
+        isSubtitleVisible=savedInstanceState!!.getBoolean(SAVED_SUBTITLE_VISIBLE)
         updateUi()
         return mView
     }
     private fun updateUi():Unit{
-        CrimeLab.fillCrimeList()
-
         mCrimeAdapter=CrimeAdapter(CrimeLab.mCrimeList)
         mCrimeRecyclerView.adapter=mCrimeAdapter
         mCrimeAdapter.notifyItemChanged(mPosition)
+        updateSubtitle()
 
 
     }
 
 
-   inner class CrimeHolder(inflater:LayoutInflater,parent:ViewGroup): ViewHolder(
-        inflater.inflate(R.layout.list_item_crime,parent,false)){
+   inner class CrimeHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder(
+       inflater.inflate(R.layout.list_item_crime, parent, false)
+   ){
         var mTitleTextView:TextView
         var mDateTextView:TextView
         var mCrimeSolved:ImageView
@@ -52,7 +59,7 @@ class CrimeListFragment:Fragment() {
 
 
        }
-       fun bind(crime:Crime){
+       fun bind(crime: Crime){
            if(!crime.mRequiresPolice){
            mCrime=crime
            mTitleTextView.text=crime.mTitle
@@ -74,26 +81,26 @@ class CrimeListFragment:Fragment() {
 
 
         }
-        fun bind(crime:Crime){
+        fun bind(crime: Crime){
             if(crime.mRequiresPolice){
             mCrime=crime
             mTitleTextView.text=crime.mTitle
-            mDateTextView.text=DateFormat.format("EEEE, MMMM d, yyyy",crime.mDate)
+            mDateTextView.text=DateFormat.format("EEEE, MMMM d, yyyy", crime.mDate)
             }
 
         }
 
     }
 
-    inner class CrimeAdapter(var crimeList:List<Crime>):RecyclerView.Adapter<ViewHolder>() {
+    inner class CrimeAdapter(var crimeList: List<Crime>):RecyclerView.Adapter<ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             var inflater:LayoutInflater= LayoutInflater.from(parent.context)
             var view:View
             if(viewType==0){
-                inflater.inflate(R.layout.list_item_crime,parent,false)
-                return CrimeHolder(inflater,parent)
+                inflater.inflate(R.layout.list_item_crime, parent, false)
+                return CrimeHolder(inflater, parent)
             } else{
-                view=inflater.inflate(R.layout.serious_list_item_crime,parent,false)
+                view=inflater.inflate(R.layout.serious_list_item_crime, parent, false)
             return SeriousCrimeHolder(view)}
         }
 
@@ -108,7 +115,7 @@ class CrimeListFragment:Fragment() {
 
             }
             holder.itemView.setOnClickListener{
-                var intent=CrimePaperActivity.newIntent(activity!!,crimeList[position].mId!!)
+                var intent=CrimePaperActivity.newIntent(activity!!, crimeList[position].mId)
                 startActivity(intent)
                 mPosition=position
             }
@@ -129,5 +136,43 @@ class CrimeListFragment:Fragment() {
     override fun onResume() {
         super.onResume()
         updateUi()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+        var menuItem=menu.findItem(R.id.show_subtitle)
+        if(isSubtitleVisible){
+            menuItem.setTitle(R.string.hide_subtitle)
+        }
+        else{menuItem.setTitle(R.string.show_subtitle)}
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.new_crime -> {
+                val crime = Crime()
+                CrimeLab.mCrimeList.add(crime)
+                val intent = CrimePaperActivity.newIntent(activity!!, crime.mId)
+                startActivity(intent)
+                return true
+            }
+            R.id.show_subtitle->{updateSubtitle()
+            return true}
+            else->return super.onOptionsItemSelected(item)
+        }
+    }
+    private fun updateSubtitle() {
+        val crimeCount: Int = CrimeLab.mCrimeList.size
+        var subtitle:String? = getString(R.string.subtitle_format, crimeCount)
+        if (isSubtitleVisible)
+            subtitle=null
+        val activity = activity as AppCompatActivity?
+        activity!!.supportActionBar!!.subtitle=subtitle
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE,isSubtitleVisible)
     }
 }
