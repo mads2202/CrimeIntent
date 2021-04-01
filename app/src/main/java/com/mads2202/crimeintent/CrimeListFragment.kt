@@ -26,6 +26,7 @@ class CrimeListFragment:Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        activity?.let { CrimeLab.initDB(it) }
         var mView= inflater.inflate(R.layout.fragment_crime_list, container, false)
         mCrimeRecyclerView=mView.findViewById(R.id.crime_recycler_view)
         mCrimeRecyclerView.layoutManager=LinearLayoutManager(activity)
@@ -36,7 +37,7 @@ class CrimeListFragment:Fragment() {
         return mView
     }
     private fun updateUi():Unit{
-        mCrimeAdapter=CrimeAdapter(CrimeLab.mCrimeList)
+        mCrimeAdapter=CrimeAdapter(CrimeLab.getCrimes() as MutableList<Crime>)
         mCrimeRecyclerView.adapter=mCrimeAdapter
         mCrimeAdapter.notifyItemChanged(mPosition)
         updateSubtitle()
@@ -153,7 +154,7 @@ class CrimeListFragment:Fragment() {
         when(item.itemId){
             R.id.new_crime -> {
                 val crime = Crime()
-                CrimeLab.mCrimeList.add(crime)
+                CrimeLab.addCrime(crime)
                 val intent = CrimePaperActivity.newIntent(activity!!, crime.mId)
                 startActivity(intent)
                 return true
@@ -164,7 +165,7 @@ class CrimeListFragment:Fragment() {
         }
     }
     private fun updateSubtitle() {
-        val crimeCount: Int = CrimeLab.mCrimeList.size
+        val crimeCount: Int = CrimeLab.getCrimes()!!.size
         var subtitle:String? = getString(R.string.subtitle_format, crimeCount)
         if (isSubtitleVisible)
             subtitle=null

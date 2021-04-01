@@ -64,7 +64,8 @@ class CrimeFragment : Fragment() {
         }
         mLastElementButton = mView.findViewById(R.id.last_element_button)
         mLastElementButton.setOnClickListener {
-            CrimePaperActivity.mViewPager.currentItem=CrimeLab.mCrimeList.size-1
+            CrimePaperActivity.mViewPager.currentItem=CrimeLab.getCrimes()!!.size-1
+
         }
         return mView
     }
@@ -126,7 +127,7 @@ class CrimeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.delete_crime_item->{
-                CrimeLab.mCrimeList.remove(mCrime)
+               CrimeLab.deleteCrime(mCrime)
                 activity?.finish()
             return true}
             else->return super.onOptionsItemSelected(item)

@@ -30,7 +30,7 @@ class CrimePaperActivity : AppCompatActivity() {
         mViewPager = findViewById(R.id.crime_view_paper)
         var crimeId=intent.getSerializableExtra(EXTRA_CRIME_ID) as UUID
         var fragmentManager = supportFragmentManager
-        mCrimes = CrimeLab.mCrimeList
+        mCrimes = CrimeLab.getCrimes() as MutableList<Crime>
         mViewPager.adapter = object : FragmentStatePagerAdapter(fragmentManager) {
             override fun getCount(): Int {
                 return mCrimes.size
