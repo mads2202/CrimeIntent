@@ -30,6 +30,7 @@ class CrimeListFragment:Fragment() {
         mCrimeRecyclerView=mView.findViewById(R.id.crime_recycler_view)
         mCrimeRecyclerView.layoutManager=LinearLayoutManager(activity)
         setHasOptionsMenu(true)
+        if(savedInstanceState?.getBoolean(SAVED_SUBTITLE_VISIBLE)!=null)
         isSubtitleVisible=savedInstanceState!!.getBoolean(SAVED_SUBTITLE_VISIBLE)
         updateUi()
         return mView

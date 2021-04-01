@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -49,6 +47,7 @@ class CrimeFragment : Fragment() {
             mCrime = Crime()
         else
             mCrime = CrimeLab.getCrime(id)!!
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -116,6 +115,21 @@ class CrimeFragment : Fragment() {
             var date= data!!.getSerializableExtra(TimePickerFragment.EXTRA_TIME) as Date
             mCrime.mDate=date
             mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z",mCrime.mDate)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.crime_fragment_menu,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.delete_crime_item->{
+                CrimeLab.mCrimeList.remove(mCrime)
+                activity?.finish()
+            return true}
+            else->return super.onOptionsItemSelected(item)
         }
     }
 }
