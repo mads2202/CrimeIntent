@@ -22,7 +22,6 @@ object CrimeLab {
     }
 
     fun getCrime(id: UUID): Crime? {
-        return null
         val cursor: CrimeCursorWraper = queryCrimes(
             CrimeTable.Cols.UUID + " = ?", arrayOf(id.toString())
         )

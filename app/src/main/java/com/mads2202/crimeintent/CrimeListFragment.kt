@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import java.util.*
 
 
 class CrimeListFragment:Fragment() {
@@ -40,6 +41,7 @@ class CrimeListFragment:Fragment() {
         mCrimeAdapter=CrimeAdapter(CrimeLab.getCrimes() as MutableList<Crime>)
         mCrimeRecyclerView.adapter=mCrimeAdapter
         mCrimeAdapter.notifyItemChanged(mPosition)
+        mCrimeAdapter.notifyDataSetChanged()
         updateSubtitle()
 
 
@@ -133,6 +135,9 @@ class CrimeListFragment:Fragment() {
                 return 0
             else return 1
         }
+        fun setCrimes(crimes: List<Crime>) {
+            crimeList = crimes
+        }
     }
 
     override fun onResume() {
@@ -153,14 +158,16 @@ class CrimeListFragment:Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.new_crime -> {
-                val crime = Crime()
+                val crime = Crime(UUID.randomUUID())
                 CrimeLab.addCrime(crime)
                 val intent = CrimePaperActivity.newIntent(activity!!, crime.mId)
                 startActivity(intent)
                 return true
             }
-            R.id.show_subtitle->{updateSubtitle()
-            return true}
+            R.id.show_subtitle -> {
+                updateSubtitle()
+                return true
+            }
             else->return super.onOptionsItemSelected(item)
         }
     }
@@ -175,6 +182,6 @@ class CrimeListFragment:Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(SAVED_SUBTITLE_VISIBLE,isSubtitleVisible)
+        outState.putBoolean(SAVED_SUBTITLE_VISIBLE, isSubtitleVisible)
     }
 }

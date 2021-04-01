@@ -43,8 +43,10 @@ class CrimeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var id: UUID = arguments!!.getSerializable(CrimePaperActivity.EXTRA_CRIME_ID) as UUID
-        if (CrimeLab.getCrime(id) == null)
-            mCrime = Crime()
+        if (CrimeLab.getCrime(id) == null){
+            mCrime = Crime(UUID.randomUUID())
+            CrimeLab.addCrime(mCrime)
+        }
         else
             mCrime = CrimeLab.getCrime(id)!!
         setHasOptionsMenu(true)
@@ -79,6 +81,7 @@ class CrimeFragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 mCrime.mTitle = s.toString()
+                CrimeLab.updateCrime(mCrime)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -110,11 +113,13 @@ class CrimeFragment : Fragment() {
         if(requestCode==REQUEST_DATE){
            var date= data!!.getSerializableExtra(DatePickerFragment.EXTRA_DATE) as Date
             mCrime.mDate=date
+            CrimeLab.updateCrime(mCrime)
             mDateButton.text = android.text.format.DateFormat.format("EEEE, dd MMMM, yyyy",mCrime.mDate)
         }
         if(requestCode== REQUEST_TIME){
             var date= data!!.getSerializableExtra(TimePickerFragment.EXTRA_TIME) as Date
             mCrime.mDate=date
+            CrimeLab.updateCrime(mCrime)
             mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z",mCrime.mDate)
         }
     }
