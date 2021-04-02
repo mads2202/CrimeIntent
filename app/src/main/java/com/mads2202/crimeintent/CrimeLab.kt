@@ -54,6 +54,7 @@ object CrimeLab {
         values.put(CrimeDbSchema.CrimeTable.Cols.SOLVED, 1)
         else
             values.put(CrimeDbSchema.CrimeTable.Cols.SOLVED, 0)
+        values.put(CrimeDbSchema.CrimeTable.Cols.SUSPECT,crime.suspect)
         return values
     }
     private fun queryCrimes(whereClause: String?, whereArgs: Array<String>?):CrimeCursorWraper{
