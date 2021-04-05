@@ -1,5 +1,6 @@
 package com.mads2202.crimeintent
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -32,6 +33,7 @@ class CrimeFragment : Fragment() {
     lateinit var mSuspectButton: Button
     private lateinit var mPhotoButton: ImageButton
     private lateinit var mPhotoView: ImageView
+    var callbacks:Callbacks?=null
     var mPhotoFile: File?= null
 
     companion object {
@@ -59,10 +61,13 @@ class CrimeFragment : Fragment() {
         if (CrimeLab.getCrime(id) == null){
             mCrime = Crime(UUID.randomUUID())
             CrimeLab.addCrime(mCrime)
+            callbacks!!.onCrimeUpdated(mCrime)
         }
         else
             mCrime = CrimeLab.getCrime(id)!!
         mPhotoFile=CrimeLab.getPhotoFile(mCrime, activity!!)
+        callbacks!!.onCrimeUpdated(mCrime)
+
         setHasOptionsMenu(true)
     }
 
@@ -148,6 +153,7 @@ class CrimeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 mCrime.mTitle = s.toString()
                 CrimeLab.updateCrime(mCrime)
+                callbacks!!.onCrimeUpdated(mCrime)
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -159,22 +165,26 @@ class CrimeFragment : Fragment() {
             "EEEE, dd MMMM, yyyy",
             mCrime.mDate
         )
+        callbacks!!.onCrimeUpdated(mCrime)
         mDateButton.setOnClickListener {
             val fragmentManager=fragmentManager
             val datePickerFragment=DatePickerFragment.newInstance(mCrime.mDate)
             datePickerFragment.setTargetFragment(this, REQUEST_DATE)
             datePickerFragment.show(fragmentManager!!, DIALOG_DATE)
+            callbacks!!.onCrimeUpdated(mCrime)
         }
         mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z", mCrime.mDate)
         mTimeButton.setOnClickListener {
             val timePickerFragment=TimePickerFragment.newInstance(mCrime.mDate)
             timePickerFragment.setTargetFragment(this, REQUEST_TIME)
             timePickerFragment.show(fragmentManager!!, DIALOG_TIME)
+            callbacks!!.onCrimeUpdated(mCrime)
         }
 
         mSolvedCheckBox.setChecked(mCrime.mIsSolved)
         mSolvedCheckBox.setOnCheckedChangeListener { compoundButton: CompoundButton, b: Boolean ->
             mCrime.mIsSolved = b
+            callbacks!!.onCrimeUpdated(mCrime)
         }
     }
 
@@ -183,6 +193,7 @@ class CrimeFragment : Fragment() {
            val date= data!!.getSerializableExtra(DatePickerFragment.EXTRA_DATE) as Date
             mCrime.mDate=date
             CrimeLab.updateCrime(mCrime)
+            callbacks!!.onCrimeUpdated(mCrime)
             mDateButton.text = android.text.format.DateFormat.format(
                 "EEEE, dd MMMM, yyyy",
                 mCrime.mDate
@@ -192,6 +203,7 @@ class CrimeFragment : Fragment() {
             val date= data!!.getSerializableExtra(TimePickerFragment.EXTRA_TIME) as Date
             mCrime.mDate=date
             CrimeLab.updateCrime(mCrime)
+            callbacks!!.onCrimeUpdated(mCrime)
             mTimeButton.text=android.text.format.DateFormat.format("HH:mm:ss z", mCrime.mDate)
         }
         if (requestCode== REQUEST_CONTACT){
@@ -231,6 +243,7 @@ class CrimeFragment : Fragment() {
         when(item.itemId){
             R.id.delete_crime_item -> {
                 CrimeLab.deleteCrime(mCrime)
+                callbacks!!.onCrimeUpdated(mCrime)
                 activity?.finish()
                 return true
             }
@@ -270,5 +283,18 @@ class CrimeFragment : Fragment() {
             )
             mPhotoView.setImageBitmap(bitmap)
         }
+    }
+    interface Callbacks{
+        fun onCrimeUpdated(crime:Crime)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        callbacks=context as Callbacks
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbacks=null
     }
 }

@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import java.util.*
 
-class CrimePaperActivity : AppCompatActivity() {
+class CrimePaperActivity : AppCompatActivity(),CrimeFragment.Callbacks {
 
     var mCrimes = mutableListOf<Crime>()
     companion object{
@@ -47,7 +47,9 @@ class CrimePaperActivity : AppCompatActivity() {
             }
         }
 
+    }
 
+    override fun onCrimeUpdated(crime: Crime) {
 
     }
 
