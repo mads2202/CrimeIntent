@@ -7,6 +7,7 @@ import com.mads2202.crimeintent.database.CrimeBaseHelper
 import com.mads2202.crimeintent.database.CrimeCursorWraper
 import com.mads2202.crimeintent.database.CrimeDbSchema
 import com.mads2202.crimeintent.database.CrimeDbSchema.CrimeTable
+import java.io.File
 import java.util.*
 
 
@@ -86,5 +87,8 @@ object CrimeLab {
     fun deleteCrime(crime:Crime){
         mDataBase.delete(CrimeDbSchema.CrimeTable.NAME,CrimeTable.Cols.UUID + " = ?", arrayOf(crime.mId.toString()))
     }
-
+    fun  getPhotoFile(crime:Crime,context:Context):File{
+        var fileDir=context.filesDir
+        return  File(fileDir, crime.getPhotoName())
+    }
 }

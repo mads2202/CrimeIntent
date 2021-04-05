@@ -14,6 +14,9 @@ class Crime(val mId: UUID) {
         mDate = Date()
         mIsSolved = false
     }
+    fun getPhotoName():String{
+        return "IMG_${mId.toString()}.jpg"
+    }
 
 
 }
