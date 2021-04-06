@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -20,6 +21,7 @@ class CrimeListFragment : Fragment() {
     var callback: Callbacks? = null
     var isSubtitleVisible = false
     var mPosition: Int = 0
+    var itemTouchHelper:ItemTouchHelper?=null
 
     companion object {
         val SAVED_SUBTITLE_VISIBLE = "subtitle"
@@ -34,10 +36,26 @@ class CrimeListFragment : Fragment() {
         var mView = inflater.inflate(R.layout.fragment_crime_list, container, false)
         mCrimeRecyclerView = mView.findViewById(R.id.crime_recycler_view)
         mCrimeRecyclerView.layoutManager = LinearLayoutManager(activity)
+        val swipeToDeleteCallback=object:swipeToDeleteCallback(){
+            override fun onSwiped(
+                viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
+                direction: kotlin.Int
+            ) {
+                val postion=viewHolder.position
+                var crimeList=CrimeLab.getCrimes()
+                crimeList?.get(postion)?.let { CrimeLab.deleteCrime(it) }
+                updateUi()
+
+            }
+        }
+        itemTouchHelper=ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper!!.attachToRecyclerView(mCrimeRecyclerView)
+
         setHasOptionsMenu(true)
         if (savedInstanceState?.getBoolean(SAVED_SUBTITLE_VISIBLE) != null)
             isSubtitleVisible = savedInstanceState!!.getBoolean(SAVED_SUBTITLE_VISIBLE)
         updateUi()
+        
         return mView
     }
 
@@ -209,5 +227,6 @@ class CrimeListFragment : Fragment() {
         super.onDetach()
         callback = null
     }
+
 
 }
